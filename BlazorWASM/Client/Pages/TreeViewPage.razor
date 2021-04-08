@@ -1,0 +1,29 @@
+﻿@page "/treeviewpage"
+
+@inject HttpClient http
+<h3>Tree View</h3>
+@if (menus == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+<div style="background-color:#b200ff;width:200px;">
+    <TreeView RootId="0" Menus="@menus"></TreeView>
+</div>
+}
+
+@code {
+    private List<TreeMenu> menus;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await http.GetAsync("treemenu");
+        var content = await response.Content.ReadAsStringAsync();
+
+         menus = MSJson.JsonSerializer.Deserialize<List<TreeMenu>>(content, new MSJson.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        
+
+    }
+}
+

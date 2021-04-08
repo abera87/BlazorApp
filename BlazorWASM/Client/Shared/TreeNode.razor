@@ -1,0 +1,58 @@
+﻿<li>
+    @if (!String.IsNullOrEmpty(CurrentMenu.NavigationPath))
+    {
+
+        <NavLink href="@GetURL()" Match="NavLinkMatch.All">
+            <div>
+                @GetLevel @CurrentMenu.Name
+            </div>
+        </NavLink>
+
+
+    }
+    else
+    {
+        <div @onclick="@(()=>ToggleMenu())">@GetLevel @CurrentMenu.Name</div>
+    }
+    @if (HasChild(CurrentMenu.Id))
+    {
+        <ul class="@toggleCss">
+            @foreach (var cm in Menus.Where(x => x.ParentId == CurrentMenu.Id))
+            {
+                <TreeNode CurrentMenu="@cm" Menus="@Menus" Level="@(Level+1)" @key="cm"></TreeNode>
+            }
+        </ul>
+    }
+</li>
+
+@code {
+    [Parameter]
+    public IList<TreeMenu> Menus { get; set; }
+    [Parameter]
+    public TreeMenu CurrentMenu { get; set; }
+    [Parameter]
+    public int Level { get; set; }
+
+    private string GetURL()
+    {
+        if (CurrentMenu.Id == 0)
+            return CurrentMenu.NavigationPath;
+        else
+            return $"{CurrentMenu.NavigationPath}/{CurrentMenu.Id}";
+    }
+
+    private string GetLevel => new string('-', Level);
+
+    private bool toggleMenu = true;
+
+    private string toggleCss => (CurrentMenu.Id != 0 && toggleMenu) ? "collapse" : "expand";
+
+    private bool HasChild(int menuId)
+    {
+        return Menus.Where(x => x.ParentId == menuId).Any();
+    }
+    private void ToggleMenu()
+    {
+        toggleMenu = !toggleMenu;
+    }
+}

@@ -1,0 +1,44 @@
+﻿@page "/login"
+
+@inject NavigationManager navigationManager
+@inject IUserService userService
+
+@layout EmptyLayout
+
+<EditForm Model="@lm" OnValidSubmit="@SubmitForm">
+    <DataAnnotationsValidator/>
+    <div class="row">
+        <div class="col-md-2">&nbsp;</div>
+        <div class="col-md-8">
+            <div class="row mb-3">
+                <label for="email" class="col-sm-2 col-form-label">Email</label>
+                <div class="col-sm-10">
+                    <InputText type="email" class="form-control" id="email" @bind-Value="lm.Email" />
+                    <ValidationMessage For="@(()=>lm.Email)"/>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="password" class="col-sm-2 col-form-label">Password</label>
+                <div class="col-sm-10">
+                    <InputText type="password" class="form-control" id="password" @bind-Value="lm.Password" />
+                    <ValidationMessage For="@(()=>lm.Password)" />
+                </div>
+            </div>
+           <button type="submit" class="btn btn-success">Sign in</button>
+            <ValidationSummary/>
+        </div>
+        <div class="col-md-2">&nbsp;</div>
+    </div>
+</EditForm>
+
+
+    @code {
+        private LoginModel lm = new();
+
+        private void SubmitForm()
+        {
+            //Console.WriteLine($"{lm.Email} -- {lm.Password}");
+            userService.Login(lm);
+            navigationManager.NavigateTo("/");
+        }
+    }

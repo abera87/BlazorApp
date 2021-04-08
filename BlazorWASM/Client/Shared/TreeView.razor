@@ -1,0 +1,15 @@
+﻿<ul>
+    @foreach (var m in Menus.Where(x => x.Id == RootId))
+    {
+        <TreeNode CurrentMenu="@m" Menus="@Menus" Level="0" @key="m" />
+    }
+</ul>
+
+@code {
+    [Parameter]
+    public IList<TreeMenu> Menus { get; set; }
+    [Parameter]
+    public int RootId { get; set; }
+
+ 
+}

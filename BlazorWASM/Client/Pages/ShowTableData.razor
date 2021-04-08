@@ -1,0 +1,79 @@
+﻿@page  "/showtabledata"
+@page "/showtabledata/{Id:int}"
+
+@inject HttpClient http
+
+<h3>ShowTableData</h3>
+@Id
+
+
+@if (rows == null)
+{
+    <p> Loading...</p>
+}
+else
+{
+    <h2>Table data @dbVM.TableName</h2>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                @foreach (var c in dbVM.Columns)
+                {
+                    <th scope="col">@c.Name</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in rows)
+            {
+                <tr>
+
+                    @foreach (var c in dbVM.Columns)
+                    {
+
+                        <td scope="row">
+                            @if (c.TypeName.Contains("DateTime"))
+                            {
+                                @DateTime.Parse(r.GetValue(@c.Name).ToString()).ToShortDateString()
+                            }
+                            else
+                            {
+                                @r.GetValue(@c.Name)
+                            }
+                        </td>
+                    }
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    private DatabaseTableVM dbVM;
+    private dynamic rows;
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var response = await http.GetAsync($"databasetable/{Id}");
+        var content = await response.Content.ReadAsStringAsync();
+
+        dbVM = MSJson.JsonSerializer.Deserialize<DatabaseTableVM>(content, new MSJson.JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+
+        rows = JsonConvert.DeserializeObject(dbVM.RowsJSONString);//it is returing a JArray Newtonsoft.Json.Linq.JArray.Parse(dbVM.RowsJSONString);
+                                                                  //dynamic r1 = rows[0];
+                                                                  //int id = r1.Id;
+
+        //Console.WriteLine(rows.Count);
+        //foreach (var i in rows)
+        //{
+        //    Console.WriteLine(i.GetValue("Id"));
+        //}
+
+        await base.OnParametersSetAsync();
+    }
+}
